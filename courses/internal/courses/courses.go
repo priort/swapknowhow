@@ -8,15 +8,23 @@ type Course struct {
 }
 
 type CoursesRepository interface {
-	getCourses() []Course
+	GetCourses() []Course
+	CreateCourse(course Course)
 }
 
-type InMemoryCoursesRepository struct{}
+type InMemoryCoursesRepository struct {
+	courses []Course
+}
 
-func (InMemoryCoursesRepository) GetCourses() []Course {
-	return []Course{{Name: "my course", Rating: 5, Descripton: "a nice course about programming", DurationInSeconds: 10}}
+func (r *InMemoryCoursesRepository) GetCourses() []Course {
+	return r.courses
+}
+
+func (r *InMemoryCoursesRepository) CreateCourse(course Course) {
+	r.courses = append(r.courses, course)
+	println(r.courses)
 }
 
 func NewInMemoryCoursesRepository() *InMemoryCoursesRepository {
-	return &InMemoryCoursesRepository{}
+	return &InMemoryCoursesRepository{courses: make([]Course, 0, 10)}
 }
