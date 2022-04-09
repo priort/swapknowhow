@@ -28,14 +28,6 @@ spec:
       ports:
         - containerPort: 5432
           hostPort: 5432
-      securityContext:
-        capabilities:
-          drop:
-            - CAP_MKNOD
-            - CAP_NET_RAW
-            - CAP_AUDIT_WRITE
-      stdin: true
-      tty: true
       volumeMounts:
         - mountPath: /var/lib/postgresql/data
           name: coursesdb-pv-claim
@@ -54,7 +46,7 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: 5Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -72,22 +64,4 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
-
-
-# apiVersion: v1
-# kind: Pod
-# metadata:
-#   name: swapknowhow-postgres
-#   labels:
-#     name: swapknowhow-postgres
-# spec:
-#   containers:
-#   - name: swapknowhow-postgres
-#     image: <Image>
-#     resources:
-#       limits:
-#         memory: "128Mi"
-#         cpu: "500m"
-#     ports:
-#       - containerPort: <Port>
+      storage: 1Gi
