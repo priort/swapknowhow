@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: coursesdb
+  name: coursesdb
+spec:
+  containers:
+    - args:
+        - postgres
+      env:
+        - name: POSTGRES_DB
+          value: coursesdb
+        - name: PGDATA
+          value: coursesdb
+        - name: POSTGRES_PASSWORD
+          value: password
+      image: docker.io/library/postgres:latest
+      name: coursesdb
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/sh", "-c", "apt update && apt install -y netcat && while ! nc -z localhost 5432; do sleep 1; done && psql -U postgres -d coursesdb -c 'CREATE TABLE IF NOT EXISTS courses(uuid uuid, created timestamp, name varchar, rating int, description varchar, duration_millis int);'"]
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 5432
+          hostPort: 5432
+      securityContext:
+        capabilities:
+          drop:
+            - CAP_MKNOD
+            - CAP_NET_RAW
+            - CAP_AUDIT_WRITE
+      stdin: true
+      tty: true
+      volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: coursesdb-pv-claim
+  volumes:
+    - name: coursesdb-pv-claim
+      persistentVolumeClaim:
+        claimName: postgres-pv-claim
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv-volume
+  labels:
+    type: local
+    app: coursesdb
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: swapknowhow-postgres
+#   labels:
+#     name: swapknowhow-postgres
+# spec:
+#   containers:
+#   - name: swapknowhow-postgres
+#     image: <Image>
+#     resources:
+#       limits:
+#         memory: "128Mi"
+#         cpu: "500m"
+#     ports:
+#       - containerPort: <Port>

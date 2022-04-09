@@ -25,7 +25,7 @@ func TestCanCreateAndRetrieveCourses(t *testing.T) {
 	courseCreationRequest := httptest.NewRequest("POST", "/courses", body)
 	courseCreationResponseRecorder := httptest.NewRecorder()
 
-	createCourse(courseCreationResponseRecorder, courseCreationRequest)
+	CreateCourse(courseCreationResponseRecorder, courseCreationRequest)
 	courseCreationResponse := courseCreationResponseRecorder.Result()
 	defer courseCreationResponse.Body.Close()
 
@@ -36,7 +36,7 @@ func TestCanCreateAndRetrieveCourses(t *testing.T) {
 	req := httptest.NewRequest("GET", "/courses", nil)
 	recorder := httptest.NewRecorder()
 
-	getCourses(recorder, req)
+	GetCourses(recorder, req)
 
 	res := recorder.Result()
 	defer res.Body.Close()
