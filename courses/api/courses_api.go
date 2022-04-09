@@ -6,9 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"swapknowhow/courses/internal/courses"
+	"swapknowhow/courses/internal/courses/db/postgres"
 )
 
-var coursesRepo = courses.NewInMemoryCoursesRepository()
+var coursesRepo = postgres.NewPostgresCoursesRepository()
+
+//var coursesRepo = courses.NewInMemoryCoursesRepository()
 
 func CreateCourse(writer http.ResponseWriter, req *http.Request) {
 	courseJson, err := ioutil.ReadAll(req.Body)

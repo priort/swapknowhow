@@ -2,7 +2,10 @@ module swapknowhow/courses
 
 go 1.18
 
-require github.com/jackc/pgx/v4 v4.15.0
+require (
+	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/jackc/pgx/v4 v4.15.0
+)
 
 require (
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect

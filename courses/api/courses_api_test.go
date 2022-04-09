@@ -10,15 +10,15 @@ import (
 	"testing"
 )
 
-var stubbedCourses = `[{"Name":"my course","Rating":5,"Descripton":"a nice course about programming","DurationInSeconds":10}]`
+var stubbedCourses = `[{"Name":"my course","Rating":5,"Descripton":"a nice course about programming","DurationMillis":10}]`
 
 func TestCanCreateAndRetrieveCourses(t *testing.T) {
 
 	courseToCreate := courses.Course{
-		Name:              "test course",
-		Rating:            5,
-		Descripton:        "course to test",
-		DurationInSeconds: 50,
+		Name:           "test course",
+		Rating:         5,
+		Descripton:     "course to test",
+		DurationMillis: 50,
 	}
 	jsonBody, _ := json.Marshal(courseToCreate)
 	body := strings.NewReader(string(jsonBody))
