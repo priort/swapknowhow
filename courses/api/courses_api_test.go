@@ -5,14 +5,29 @@ import (
 	"io/ioutil"
 	"net/http/httptest"
 	"strings"
-
 	"swapknowhow/courses/internal/courses"
 	"testing"
 )
 
-var stubbedCourses = `[{"Name":"my course","Rating":5,"Descripton":"a nice course about programming","DurationMillis":10}]`
+type CoursesRepositoryStub struct {
+	courses []courses.Course
+}
+
+func (r *CoursesRepositoryStub) GetCourses() []courses.Course {
+	return r.courses
+}
+
+func (r *CoursesRepositoryStub) CreateCourse(course courses.Course) {
+	r.courses = append(r.courses, course)
+}
+
+func newInMemoryCoursesRepositoryStub() *CoursesRepositoryStub {
+	return &CoursesRepositoryStub{courses: make([]courses.Course, 0, 10)}
+}
 
 func TestCanCreateAndRetrieveCourses(t *testing.T) {
+˚
+	api := Api{CoursesRepo: newInMemoryCoursesRepositoryStub()}
 
 	courseToCreate := courses.Course{
 		Name:           "test course",
@@ -25,7 +40,7 @@ func TestCanCreateAndRetrieveCourses(t *testing.T) {
 	courseCreationRequest := httptest.NewRequest("POST", "/courses", body)
 	courseCreationResponseRecorder := httptest.NewRecorder()
 
-	CreateCourse(courseCreationResponseRecorder, courseCreationRequest)
+	api.Courses(courseCreationResponseRecorder, courseCreationRequest)
 	courseCreationResponse := courseCreationResponseRecorder.Result()
 	defer courseCreationResponse.Body.Close()
 
@@ -36,7 +51,7 @@ func TestCanCreateAndRetrieveCourses(t *testing.T) {
 	req := httptest.NewRequest("GET", "/courses", nil)
 	recorder := httptest.NewRecorder()
 
-	GetCourses(recorder, req)
+	api.Courses(recorder, req)
 
 	res := recorder.Result()
 	defer res.Body.Close()

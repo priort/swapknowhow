@@ -6,31 +6,51 @@ import (
 	"io/ioutil"
 	"net/http"
 	"swapknowhow/courses/internal/courses"
-	"swapknowhow/courses/internal/courses/db/postgres"
 )
 
-var coursesRepo = postgres.NewPostgresCoursesRepository()
+type Api struct {
+	CoursesRepo courses.CoursesRepository
+}
 
-//var coursesRepo = courses.NewInMemoryCoursesRepository()
+func (api *Api) Courses(writer http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "GET":
+		api.getCourses(writer, req)
+	case "POST":
+		api.createCourse(writer, req)
+	default:
+		writer.Write([]byte("Invalid method"))
+		writer.WriteHeader(400)
+	}
+}
 
-func CreateCourse(writer http.ResponseWriter, req *http.Request) {
+func (api *Api) createCourse(writer http.ResponseWriter, req *http.Request) {
 	courseJson, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		writer.Write([]byte("could not read from request body"))
+		fmt.Printf("error reading request body %v\n", err)
 		writer.WriteHeader(500)
+		return
 	}
 	var course courses.Course
-	json.Unmarshal(courseJson, &course)
-	coursesRepo.CreateCourse(course)
+	err = json.Unmarshal(courseJson, &course)
+	if err != nil {
+		fmt.Printf("error deserializing course %v \n", err)
+		writer.WriteHeader(500)
+		return
+	}
+	api.CoursesRepo.CreateCourse(course)
 	writer.WriteHeader(201)
 }
 
-func GetCourses(writer http.ResponseWriter, req *http.Request) {
-	coursesJson, err := json.Marshal(coursesRepo.GetCourses())
+func (api *Api) getCourses(writer http.ResponseWriter, _ *http.Request) {
+	coursesJson, err := json.Marshal(api.CoursesRepo.GetCourses())
 	if err != nil {
-		_ = fmt.Errorf("error marshalling courses %v", err)
+		fmt.Printf("error marshalling courses %v", err)
 		writer.WriteHeader(500)
 	} else {
-		writer.Write(coursesJson)
+		_, err := writer.Write(coursesJson)
+		if err != nil {
+			fmt.Printf("error writing response %v", err)
+		}
 	}
 }

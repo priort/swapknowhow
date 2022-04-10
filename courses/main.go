@@ -4,20 +4,12 @@ import (
 	"log"
 	"net/http"
 	"swapknowhow/courses/api"
+	"swapknowhow/courses/internal/courses/db/postgres"
 )
 
 func main() {
-	http.HandleFunc("/courses", func(writer http.ResponseWriter, req *http.Request) {
-		switch req.Method {
-		case "GET":
-			api.GetCourses(writer, req)
-		case "POST":
-			api.CreateCourse(writer, req)
-		default:
-			writer.Write([]byte("Invalid method"))
-			writer.WriteHeader(400)
-		}
-	})
+	coursesApi := api.Api{CoursesRepo: postgres.NewPostgresCoursesRepository()}
+	http.HandleFunc("/courses", coursesApi.Courses)
 	log.Println("starting courses service on port 8082")
 	err := http.ListenAndServe(":8082", nil)
 	if err != nil {
