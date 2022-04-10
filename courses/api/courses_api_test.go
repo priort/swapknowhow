@@ -26,7 +26,6 @@ func newInMemoryCoursesRepositoryStub() *CoursesRepositoryStub {
 }
 
 func TestCanCreateAndRetrieveCourses(t *testing.T) {
-˚
 	api := Api{CoursesRepo: newInMemoryCoursesRepositoryStub()}
 
 	courseToCreate := courses.Course{
