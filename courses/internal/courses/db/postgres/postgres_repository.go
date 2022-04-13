@@ -15,7 +15,7 @@ type PostgresCoursesRepository struct {
 }
 
 func NewPostgresCoursesRepository() *PostgresCoursesRepository {
-	connection := "user=postgres password=password host=localhost port=5432 dbname=coursesdb"
+	connection := "user=postgres password=password host=localhost port=5432 dbname=local-coursesdb"
 	dbPool, err := pgxpool.Connect(context.Background(), connection)
 
 	if err != nil {
