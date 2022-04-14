@@ -14,8 +14,18 @@ type PostgresCoursesRepository struct {
 	Close  func()
 }
 
-func NewPostgresCoursesRepository() *PostgresCoursesRepository {
-	connection := "user=postgres password=password host=localhost port=5432 dbname=local-coursesdb"
+type PostgresConfig struct {
+	User         string
+	Password     string
+	Host         string
+	Port         int
+	DatabaseName string
+}
+
+func NewPostgresCoursesRepository(config PostgresConfig) *PostgresCoursesRepository {
+	connection := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s",
+		config.User, config.Password, config.Host, config.Port, config.DatabaseName)
+
 	dbPool, err := pgxpool.Connect(context.Background(), connection)
 
 	if err != nil {

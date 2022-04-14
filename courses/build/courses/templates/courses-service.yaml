@@ -1,0 +1,18 @@
+#kind: Deployment
+#metadata:
+#  name: {{.Release.Name}}-courses-service-deployment
+#spec:
+#  selector:
+#    matchLabels:
+#      app: {{.Release.Name}}-courses-service
+#  replicas: 1
+#  template:
+#    metadata:
+#      labels:
+#        app: {{.Release.Name}}-courses-service
+#    spec:
+#      containers:
+#        - name: {{.Release.Name}}-courses-service
+#          image: priortd/courses-service
+#          ports:
+#              - containerPort: 8084
