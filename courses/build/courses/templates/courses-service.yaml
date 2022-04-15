@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: {{.Release.Name}}-courses-service
-          image: {{ .Values.courses.image }}
+          image: {{ .Values.imageKey }}
           imagePullPolicy: IfNotPresent
           ports:
               - containerPort: 8084

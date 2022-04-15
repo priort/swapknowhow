@@ -17,6 +17,7 @@ func (api *Api) Courses(writer http.ResponseWriter, req *http.Request) {
 	case "GET":
 		api.getCourses(writer, req)
 	case "POST":
+		fmt.Println("Creating Course")
 		api.createCourse(writer, req)
 	default:
 		writer.Write([]byte("Invalid method"))

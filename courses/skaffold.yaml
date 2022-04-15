@@ -1,0 +1,17 @@
+apiVersion: skaffold/v2beta24
+build:
+  local:
+    push: false
+  artifacts:
+    - image: swapknowhow/courses-service
+kind: Config
+deploy:
+  helm:
+    releases:
+      - name: local
+        chartPath: ./build/courses
+        artifactOverrides:
+          imageKey: swapknowhow/courses-service
+          image: swapknowhow/courses-service
+        imageStrategy:
+          fqn: {}
