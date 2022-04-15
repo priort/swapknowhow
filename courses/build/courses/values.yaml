@@ -2,6 +2,15 @@ coursesdb:
   password: password
   image: docker.io/library/postgres:latest
 
+courses:
+    image: swapknowhow/courses-service:latest
+    postgres:
+      user: postgres
+      password: password
+      # host: localhost
+      port: 5432
+      dbName: coursesdb
+
 replicaCount: 1
 
 imagePullSecrets: []

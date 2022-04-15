@@ -3,10 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v4/pgxpool"
-	"log"
 	"os"
 	"swapknowhow/courses/internal/courses"
+
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type PostgresCoursesRepository struct {
@@ -29,7 +29,8 @@ func NewPostgresCoursesRepository(config PostgresConfig) *PostgresCoursesReposit
 	dbPool, err := pgxpool.Connect(context.Background(), connection)
 
 	if err != nil {
-		log.Fatal("db connection could not be established")
+		fmt.Println("db connection could not be established")
+		fmt.Printf("%v", err)
 		os.Exit(1)
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -35,6 +36,12 @@ func main() {
 		log.Fatal("No POSTGRES_DB_NAME env variable")
 	}
 
+	fmt.Println(pgUser)
+	fmt.Println(pgPasswrod)
+	fmt.Println(pgHost)
+	fmt.Println(pgPortInt)
+	fmt.Println(pgDbName)
+
 	coursesApi := api.Api{CoursesRepo: postgres.NewPostgresCoursesRepository(
 		postgres.PostgresConfig{
 			User:         pgUser,
@@ -42,14 +49,6 @@ func main() {
 			Host:         pgHost,
 			Port:         pgPortInt,
 			DatabaseName: pgDbName})}
-
-	//coursesApi := api.Api{CoursesRepo: postgres.NewPostgresCoursesRepository(
-	//	postgres.PostgresConfig{
-	//		User:         "postgres",
-	//		Password:     "password",
-	//		Host:         "localhost",
-	//		Port:         5432,
-	//		DatabaseName: "local-coursesdb"})}
 
 	http.HandleFunc("/courses", coursesApi.Courses)
 	log.Println("starting courses service on port 8082")

@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}-deployment
+spec:
+  selector:
+    matchLabels:
+      run: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+      app: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+        app: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+    spec:
+      containers:
+      - args:
+          - postgres
+        env:
+          - name: POSTGRES_DB
+            value: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+          - name: PGDATA
+            value: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+          - name: POSTGRES_PASSWORD
+            value: {{.Values.coursesdb.password}}
+        image: {{.Values.coursesdb.image}}
+        name: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "apt update && apt install -y netcat && while ! nc -z localhost 5432; do sleep 1; done && psql -U postgres -d {{.Release.Name}}-{{ .Values.courses.postgres.dbName }} -c 'CREATE TABLE IF NOT EXISTS courses(uuid uuid, created timestamp, name varchar, rating int, description varchar, duration_millis int);'"]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+          - containerPort: 5432
+            hostPort: 5432
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}-pv-claim
+      volumes:
+        - name: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}-pv-claim
+          persistentVolumeClaim:
+            claimName: {{.Release.Name}}-postgres-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+  labels:
+    app: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432 
+  selector:
+    app: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}

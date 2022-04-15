@@ -1,18 +1,49 @@
-#kind: Deployment
-#metadata:
-#  name: {{.Release.Name}}-courses-service-deployment
-#spec:
-#  selector:
-#    matchLabels:
-#      app: {{.Release.Name}}-courses-service
-#  replicas: 1
-#  template:
-#    metadata:
-#      labels:
-#        app: {{.Release.Name}}-courses-service
-#    spec:
-#      containers:
-#        - name: {{.Release.Name}}-courses-service
-#          image: priortd/courses-service
-#          ports:
-#              - containerPort: 8084
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-courses-service-deployment
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-courses-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-courses-service
+    spec:
+      containers:
+        - name: {{.Release.Name}}-courses-service
+          image: {{ .Values.courses.image }}
+          imagePullPolicy: IfNotPresent
+          ports:
+              - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: courses-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: courses-config
+data: 
+  POSTGRES_USER: {{ .Values.courses.postgres.user | quote}}
+  POSTGRES_PASSWORD: {{ .Values.courses.postgres.password | quote }}
+  POSTGRES_HOST: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+  POSTGRES_PORT: {{ .Values.courses.postgres.port | quote }}
+  POSTGRES_DB_NAME: {{.Release.Name}}-{{ .Values.courses.postgres.dbName }}
+
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-courses-service
+  labels:
+    app: {{.Release.Name}}-courses-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8082
+  selector:
+    app: {{.Release.Name}}-courses-service
