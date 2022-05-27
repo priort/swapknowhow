@@ -1,0 +1,16 @@
+FROM golang:1.18-alpine
+
+WORKDIR /swapknowhow/courses
+
+COPY go.mod ./
+
+RUN go mod tidy
+
+COPY . .
+COPY /api ./api
+COPY /internal ./internal
+COPY *.go ./
+
+#gcc and cgo not included in apline build - see https://www.ardanlabs.com/blog/2019/03/integration-testing-in-go-executing-tests-with-docker.html#:~:text=CMD%20CGO_ENABLED%3D0%20go%20test%20./...
+
+CMD CGO_ENABLED=0 go test ./...
