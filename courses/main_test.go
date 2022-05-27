@@ -21,7 +21,26 @@ func TestCoursesService(t *testing.T) {
 	if !exists {
 		t.Fatal("No COURSES_SERVICE_PORT environment variable")
 	}
+	courseToCreate := courses.Course{
+		Name:           "My test course",
+		Rating:         5,
+		Descripton:     "This is a test course",
+		DurationMillis: 199,
+	}
 
+	resp, err := http.Post(fmt.Sprintf("http://%s:%s/courses", coursesServiceHost, coursesServicePort))
+	if err != nil {
+		t.Fatalf("error from getting courses %v", err)
+	}
+	if err != nil {
+		t.Fatalf("error reading get courses response body %v", err)
+	}
+
+	coursesResponse := callCoursesEndpointWithGet(t, coursesServiceHost, coursesServicePort)
+	fmt.Println(coursesResponse)
+}
+
+func callCoursesEndpointWithGet(t *testing.T, coursesServiceHost string, coursesServicePort string) []courses.Course {
 	resp, err := http.Get(fmt.Sprintf("http://%s:%s/courses", coursesServiceHost, coursesServicePort))
 	if err != nil {
 		t.Fatalf("error from getting courses %v", err)
@@ -35,5 +54,5 @@ func TestCoursesService(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error unmarshalling get courses response body %v", err)
 	}
-	fmt.Println(coursesResponse)
+	return coursesResponse
 }
