@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-courses-service-tests-deployment
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-courses-service-tests
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-courses-service-tests
+    spec:
+      containers:
+        - name: {{.Release.Name}}-courses-service-tests
+          image: {{ .Values.imageKey }}
+          imagePullPolicy: IfNotPresent
+          ports:
+              - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: courses-service-tests-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: courses-service-tests-config
+data: 
+  COURSES_SERVICE_HOST: {{ .Values.courses.postgres.user | quote}}
+  COURSES_SERVICE_PORT: {{ .Values.courses.postgres.password | quote }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-courses-service-tests
+  labels:
+    app: {{.Release.Name}}-courses-service-tests
+spec:
+  type: NodePort
+  ports:
+    - port: 8082
+  selector:
+    app: {{.Release.Name}}-courses-service-tests
